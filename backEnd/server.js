@@ -5,6 +5,8 @@ const pool = require('./config/database');
 
 const userRoutes = require("./routes/userRoutes");
 const pitchRoutes = require("./routes/pitchRoutes");
+const userInfoRoutes = require("./routes/userInfoRoutes");
+const investorInfoRoutes = require("./routes/investorInfoRoutes");
 
 const app = express();
 
@@ -33,6 +35,9 @@ app.use((req, res, next) => {
 
 app.use("/user", userRoutes);
 app.use("/pitches", pitchRoutes);
+app.use("/profile", userInfoRoutes);
+app.use("/investor-info", investorInfoRoutes);
+
 
 
 const PORT = process.env.PORT;
