@@ -5,6 +5,8 @@ import "../styles/fund-dash.css";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
+const API_BASE = import.meta.env.VITE_API_URL;
+
 const FundDash = () => {
   const { user } = useAuthContext(); 
   const [pitches, setPitches] = useState([]);
@@ -23,7 +25,7 @@ const FundDash = () => {
       return;
     }
 
-    const endpoint = `http://127.0.0.1:8000/api/users/${user.id}/pitches`;
+    const endpoint = `${API_BASE}/pitches/users/${user.id}/pitches`;
     const headers = {
       "Content-Type": "application/json",
       "Authorization": `Bearer ${localStorage.getItem("token")}`,
@@ -56,7 +58,7 @@ const FundDash = () => {
     const token = localStorage.getItem("token");
 
     console.log("Deleting pitch");
-    console.log("Endpoint:", `http://127.0.0.1:8000/api/users/${user.id}/pitches/${id}`);
+    console.log("Endpoint:", `${API_BASE}/pitches/users/${user.id}/pitches/${id}`);
     console.log("Method: DELETE");
     console.log("Headers:", {
       Authorization: `Bearer ${token}`,
@@ -64,7 +66,7 @@ const FundDash = () => {
     });
 
     try {
-      const response = await fetch(`http://127.0.0.1:8000/api/users/${user.id}/pitches/${id}`, {
+      const response = await fetch(`${API_BASE}/pitches/users/${user.id}/pitches/${id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,

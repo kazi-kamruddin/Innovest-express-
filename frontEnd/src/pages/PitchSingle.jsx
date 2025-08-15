@@ -9,8 +9,10 @@ const PitchSingle = () => {
   const { id } = useParams();
   const navigate = useNavigate();
 
+  const API_BASE = import.meta.env.VITE_API_URL;
+
   useEffect(() => {
-    fetch(`http://127.0.0.1:8000/api/pitches/${id}`)
+    fetch(`${API_BASE}/pitches/${id}`)
       .then((response) => response.json())
       .then((data) => setPitch(data))
       .catch((error) => console.error("Error fetching pitch:", error));
