@@ -70,7 +70,7 @@ const PitchSingle = () => {
 
       <button
         className="view-profile-button"
-        onClick={() => navigate(`/profile/${pitch.user.id}`)}
+        onClick={() => navigate(`/profile/${pitch.user_id}`)}
       >
         View Profile
       </button>

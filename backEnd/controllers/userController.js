@@ -61,11 +61,19 @@ const signUpUser = async (req, res) => {
     );
 
     const token = createToken(result.insertId);
-    res.status(201).json({ message: "User signed up", email, id: result.insertId, token });
+    res.status(201).json({
+      token,
+      user: {
+        id: result.insertId,
+        name,
+        email
+      }
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
+
 
 module.exports = {
   loginUser,
