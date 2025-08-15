@@ -1,33 +1,41 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const sequelize = require("./config/database");
+const pool = require('./config/database');
 
-
-//const greenBeckRoutes = require('./routes/greenBeckRoutes');
-
+const userRoutes = require("./routes/userRoutes");
+const pitchRoutes = require("./routes/pitchRoutes");
 
 const app = express();
-app.use(cors({
-    origin: 'http://localhost:5173'  
-}));
-app.use(express.json());  
 
+app.use(cors({
+  origin: 'http://localhost:5173'
+}));
+app.use(express.json());
 
 app.use((req, res, next) => {
-    console.log(`${req.method} ${req.path}`);
-    next();
+  console.log(`${req.method} ${req.path}`);
+  next();
 });
 
 
-app.use('/api/greenbeck', greenBeckRoutes);
+
+(async () => {
+  try {
+    const conn = await pool.getConnection();
+    console.log("Connected to RAILWAY MySQL");
+    conn.release();
+  } catch (err) {
+    console.error("Database connection failed:", err);
+  }
+})();
 
 
-sequelize.authenticate()
-  .then(() => console.log("Connected to MySQL using Sequelize"))
-  .catch(err => console.error("Database connection error:", err));
+app.use("/user", userRoutes);
+app.use("/pitches", pitchRoutes);
+
 
 const PORT = process.env.PORT;
 app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+  console.log(`Server is running on port ${PORT}`);
 });

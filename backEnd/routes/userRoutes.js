@@ -10,6 +10,9 @@ const router = express.Router();
 router.post("/login", loginUser);
 
 // signUp
-router.post("/sign-up", signUpUser);
+router.post("/register", signUpUser);
+
+//token validation
+//router.post("/validate-token", validateJwtToken);
 
 module.exports = router;

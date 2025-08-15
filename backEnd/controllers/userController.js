@@ -1,40 +1,73 @@
-const { User } = require("../models");
-const jwt = require('jsonwebtoken');
+const pool = require("../config/database"); // mysql2 pool connection
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
+const validator = require("validator");
 
 const createToken = (id) => {
-    return jwt.sign({id}, process.env.SECRET, { expiresIn: '2d' })
-  }
+  return jwt.sign({ id }, process.env.SECRET, { expiresIn: "2d" });
+};
 
+// Login
 const loginUser = async (req, res) => {
-    try {
-        const { email, password } = req.body;
-        const user = await User.login(email, password);
+  try {
+    const { email, password } = req.body;
 
-        const token = createToken(user.id);
-        
-        res.status(201).json({ message: 'User logged in', email, user, token });
-        console.log('User logged in' ,  user, token);
-    } catch (error) {
-        res.status(400).json({ error: error.message });
+    if (!email || !password) {
+      return res.status(400).json({ error: "Email and password required" });
     }
+
+    const [rows] = await pool.query("SELECT * FROM users WHERE email = ?", [email]);
+    if (rows.length === 0) {
+      return res.status(400).json({ error: "Incorrect email" });
+    }
+
+    const user = rows[0];
+    const match = await bcrypt.compare(password, user.password);
+    if (!match) {
+      return res.status(400).json({ error: "Incorrect password" });
+    }
+
+    const token = createToken(user.id);
+    res.status(200).json({ message: "User logged in", email, user, token });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 };
 
+// Signup
 const signUpUser = async (req, res) => {
-    try {
-        const { email, password } = req.body;
-        const user = await User.signup(email, password);
+  try {
+    const { name, email, password } = req.body;
 
-        const token = createToken(user.id);
-
-        res.status(201).json({ message: 'User signed up', email,user, token });
-    } catch (error) {
-        res.status(400).json({ error: error.message }); 
+    if (!email || !password) {
+      return res.status(400).json({ error: "Email and password required" });
     }
+    if (!validator.isEmail(email)) {
+      return res.status(400).json({ error: "Invalid email" });
+    }
+    // if (!validator.isStrongPassword(password)) {
+    //   return res.status(400).json({ error: "Weak password" });
+    // }
+
+    const [exists] = await pool.query("SELECT id FROM users WHERE email = ?", [email]);
+    if (exists.length > 0) {
+      return res.status(400).json({ error: "Email already in use" });
+    }
+
+    const hash = await bcrypt.hash(password, 10);
+    const [result] = await pool.query(
+      "INSERT INTO users (name, email, password) VALUES (?, ?, ?)",
+      [name, email, hash]
+    );
+
+    const token = createToken(result.insertId);
+    res.status(201).json({ message: "User signed up", email, id: result.insertId, token });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 };
-
-
 
 module.exports = {
-    loginUser,
-    signUpUser,
-}
+  loginUser,
+  signUpUser,
+};
