@@ -11,7 +11,7 @@ const investorInfoRoutes = require("./routes/investorInfoRoutes");
 const app = express();
 
 app.use(cors({
-  origin: 'http://localhost:5173',
+  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
   credentials: true
 }));
 app.use(express.json());
@@ -41,7 +41,7 @@ app.use("/investor-info", investorInfoRoutes);
 
 
 
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
